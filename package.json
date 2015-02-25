@@ -1,0 +1,44 @@
+{
+  "name": "cls-mysql",
+  "version": "1.0.0",
+  "description": "Continuation local storage shim for MySQL",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run unit && npm run lint",
+    "lint": "npm run jscs && npm run jshint",
+    "jscs": "jscs .",
+    "jshint": "jshint .",
+    "unit": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/building5/cls-mysql.git"
+  },
+  "keywords": [
+    "continuation-local-storage",
+    "node-mysql",
+    "mysql",
+    "shim",
+    "glue"
+  ],
+  "author": "David M. Lee, II",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/building5/cls-mysql/issues"
+  },
+  "homepage": "https://github.com/building5/cls-mysql",
+  "devDependencies": {
+    "chai": "^2.1.0",
+    "dirty-chai": "^1.0.1",
+    "jscs": "^1.11.3",
+    "jshint": "^2.6.0",
+    "mocha": "^2.1.0"
+  },
+  "peerDependencies": {
+    "continuation-local-storage": "^3.1.3",
+    "mysql": "^2.5.5"
+  },
+  "dependencies": {
+    "shimmer": "^1.0.0"
+  }
+}
