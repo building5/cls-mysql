@@ -1,51 +1,64 @@
 // Copyright (c) 2015. David M. Lee, II
 'use strict';
 
-var mysql = require('mysql');
-var cls = require('continuation-local-storage');
 var chai = require('chai');
+var cls = require('continuation-local-storage');
 var expect = chai.expect;
 
 var ns = cls.createNamespace('test');
-var config;
 var counter = 0;
 
+// chai config
 chai.use(require('dirty-chai'));
 chai.config.includeStack = true;
-
-try {
-  config = require('./config');
-} catch (err) {
-  config = {
-    host: 'localhost',
-    user: 'root'
-  };
-}
-
-// Pooling tests assume just one connection
-config.connectionLimit = 1;
 
 // load shim
 require('..')(ns);
 
-function asyncTestNamespace(test) {
-  return function(done) {
-    // bind done() to the root context, since it invokes the next test
-    done = ns.bind(done);
-
-    ns.run(function() {
-      var expected = ++counter;
-      ns.set('foo', expected);
-      test(function() {
-        expect(ns.get('foo'))
-          .to.be.equal(expected, 'Got unexpected value from namespace');
-        done();
-      });
-    });
-  };
-}
+// Load mysql after cls-mysql, to ensure ordering bugs are caught.
+var mysql = require('mysql');
 
 describe('The shimmed MySQL driver', function() {
+  var config;
+
+  /**
+   * Build a basic CLS test function for simple async behavior.
+   *
+   * @param {Function} test Async function to test.
+   * @returns {Function} Function to pass back to it().
+   */
+  function asyncTestNamespace(test) {
+    return function(done) {
+      // bind done() to the root context, since it invokes the next test
+      done = ns.bind(done);
+
+      ns.run(function() {
+        var expected = ++counter;
+        ns.set('foo', expected);
+        test(function() {
+          expect(ns.get('foo'))
+            .to.be.equal(expected, 'Got unexpected value from namespace');
+          done();
+        });
+      });
+    };
+  }
+
+  before(function() {
+    try {
+      config = require('./config');
+    } catch (err) {
+      // No config, or it failed to parse. Try defaults.
+      config = {
+        host: 'localhost',
+        user: 'root'
+      };
+    }
+
+    // Connection pool tests require just one connection
+    config.connectionLimit = 1;
+  });
+
   describe('using a single connection', function() {
     var connection;
 

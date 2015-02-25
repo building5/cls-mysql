@@ -3,6 +3,9 @@
 
 var shimmer = require('shimmer');
 
+// require mysql first; otherwise you can get some bizarre
+// "object is not a function" errors if cls-mysql is loaded first.
+require('mysql');
 var Protocol = require('mysql/lib/protocol/Protocol');
 var Pool = require('mysql/lib/Pool');
 
