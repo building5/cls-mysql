@@ -25,23 +25,21 @@ describe('The shimmed MySQL driver', function() {
    * Build a basic CLS test function for simple async behavior.
    *
    * @param {Function} test Async function to test.
-   * @returns {Function} Function to pass back to it().
+   * @param {Function} done Test completion callback.
    */
-  function asyncTestNamespace(test) {
-    return function(done) {
-      // bind done() to the root context, since it invokes the next test
-      done = ns.bind(done);
+  function asyncTestNamespace(test, done) {
+    // bind done() to the root context, since it invokes the next test
+    done = ns.bind(done);
 
-      ns.run(function() {
-        var expected = ++counter;
-        ns.set('foo', expected);
-        test(function() {
-          expect(ns.get('foo'))
-            .to.be.equal(expected, 'Got unexpected value from namespace');
-          done();
-        });
+    ns.run(function() {
+      var expected = ++counter;
+      ns.set('foo', expected);
+      test(function() {
+        expect(ns.get('foo'))
+          .to.be.equal(expected, 'Got unexpected value from namespace');
+        done();
       });
-    };
+    });
   }
 
   before(function() {
@@ -68,9 +66,11 @@ describe('The shimmed MySQL driver', function() {
 
     describe('.connect()', function() {
       // This passes without the shim
-      it('should maintain context', asyncTestNamespace(function(done) {
-        connection.connect(done);
-      }));
+      it('should maintain context', function(done) {
+        asyncTestNamespace(function(cb) {
+          connection.connect(cb);
+        }, done);
+      });
     });
 
     describe('.end()', function() {
@@ -78,9 +78,11 @@ describe('The shimmed MySQL driver', function() {
         connection.connect(done);
       });
 
-      it('should maintain context', asyncTestNamespace(function(done) {
-        connection.end(done);
-      }));
+      it('should maintain context', function(done) {
+        asyncTestNamespace(function(cb) {
+          connection.end(cb);
+        }, done);
+      });
     });
 
     describe('when connected', function() {
@@ -93,27 +95,35 @@ describe('The shimmed MySQL driver', function() {
       });
 
       describe('.ping()', function() {
-        it('should maintain context', asyncTestNamespace(function(done) {
-          connection.ping(done);
-        }));
+        it('should maintain context', function(done) {
+          asyncTestNamespace(function(cb) {
+            connection.ping(cb);
+          }, done);
+        });
       });
 
       describe('.query()', function() {
-        it('should maintain context', asyncTestNamespace(function(done) {
-          connection.query('select 1', done);
-        }));
+        it('should maintain context', function(done) {
+          asyncTestNamespace(function(cb) {
+            connection.query('select 1', cb);
+          }, done);
+        });
       });
 
       describe('.changeUser()', function() {
-        it('should maintain context', asyncTestNamespace(function(done) {
-          connection.changeUser(done);
-        }));
+        it('should maintain context', function(done) {
+          asyncTestNamespace(function(cb) {
+            connection.changeUser(cb);
+          }, done);
+        });
       });
 
       describe('.beginTransaction()', function() {
-        it('should maintain context', asyncTestNamespace(function(done) {
-          connection.beginTransaction(done);
-        }));
+        it('should maintain context', function(done) {
+          asyncTestNamespace(function(cb) {
+            connection.beginTransaction(cb);
+          }, done);
+        });
       });
 
       describe('within a transaction', function() {
@@ -122,22 +132,28 @@ describe('The shimmed MySQL driver', function() {
         });
 
         describe('.commit()', function() {
-          it('should maintain context', asyncTestNamespace(function(done) {
-            connection.commit(done);
-          }));
+          it('should maintain context', function(done) {
+            asyncTestNamespace(function(cb) {
+              connection.commit(cb);
+            }, done);
+          });
         });
 
         describe('.rollback()', function() {
-          it('should maintain context', asyncTestNamespace(function(done) {
-            connection.rollback(done);
-          }));
+          it('should maintain context', function(done) {
+            asyncTestNamespace(function(cb) {
+              connection.rollback(cb);
+            }, done);
+          });
         });
       });
 
       describe('.statistics()', function() {
-        it('should maintain context', asyncTestNamespace(function(done) {
-          connection.statistics(done);
-        }));
+        it('should maintain context', function(done) {
+          asyncTestNamespace(function(cb) {
+            connection.statistics(cb);
+          }, done);
+        });
       });
     });
   });
@@ -152,21 +168,25 @@ describe('The shimmed MySQL driver', function() {
     describe('using direct methods', function() {
       describe('.query()', function() {
         // This passes without the shim
-        it('should maintain context', asyncTestNamespace(function(done) {
-          pool.query('select 1', done);
-        }));
+        it('should maintain context', function(done) {
+          asyncTestNamespace(function(cb) {
+            pool.query('select 1', cb);
+          }, done);
+        });
       });
     });
 
     describe('.getConnection()', function() {
       // This passes without the shim
-      it('should maintain context', asyncTestNamespace(function(done) {
-        pool.getConnection(function(err, connection) {
-          expect(err).to.not.exist();
-          connection.release();
-          done();
-        });
-      }));
+      it('should maintain context', function(done) {
+        asyncTestNamespace(function(cb) {
+          pool.getConnection(function(err, connection) {
+            expect(err).to.not.exist();
+            connection.release();
+            cb();
+          });
+        }, done);
+      });
     });
 
     describe('when the pool is exhausted', function() {
@@ -245,9 +265,11 @@ describe('The shimmed MySQL driver', function() {
     });
 
     describe('.getConnection()', function() {
-      it('should maintain context', asyncTestNamespace(function(done) {
-        poolCluster.getConnection(done);
-      }));
+      it('should maintain context', function(done) {
+        asyncTestNamespace(function(cb) {
+          poolCluster.getConnection(cb);
+        }, done);
+      });
     });
 
     describe('when the pool is exhausted', function() {
