@@ -1,6 +1,6 @@
 {
   "name": "cls-mysql",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Continuation local storage shim for MySQL",
   "main": "index.js",
   "scripts": {
