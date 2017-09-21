@@ -12,7 +12,10 @@ var Pool = require('mysql/lib/Pool');
 module.exports = function(ns) {
   shimmer.wrap(Protocol.prototype, '_enqueue', function(enqueue) {
     return function(sequence) {
-      sequence._callback = ns.bind(sequence._callback);
+      if (sequence._callback) {
+        sequence._callback = ns.bind(sequence._callback);
+      }
+
       return enqueue.call(this, sequence);
     };
   });
