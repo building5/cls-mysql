@@ -87,7 +87,7 @@ describe('The shimmed MySQL driver', function() {
       it('should maintain context even without the callback', function(done) {
         asyncTestNamespace(function(cb) {
           connection.end();
-          cb();
+          setTimeout(cb, 100);
         }, done);
       });
     });
